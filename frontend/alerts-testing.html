@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Alert Testing | SURAKSHA NER</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #0b1220;
+            color: white;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #151f32;
+            border: 1px solid #26344d;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+        }
+
+        .inputs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: #cbd5e1;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 7px;
+            border: 1px solid #374151;
+            background: #0f172a;
+            color: white;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 7px;
+            background: #16a34a;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #0f172a;
+        }
+
+        .severity {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .message {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .tests {
+            display: grid;
+            gap: 12px;
+        }
+
+        .test {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: #0f172a;
+            border-radius: 8px;
+        }
+
+        .pass {
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .fail {
+            color: #ef4444;
+            font-weight: bold;
+        }
+
+        .history {
+            margin-top: 15px;
+        }
+
+        .history-item {
+            padding: 12px;
+            margin-top: 8px;
+            background: #0f172a;
+            border-left: 4px solid #22c55e;
+        }
+
+        @media(max-width: 700px) {
+            .inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🚨 SURAKSHA NER — Alert Testing</h1>
+
+    <p class="subtitle">
+        Alert simulation and testing module for disaster risk monitoring.
+    </p>
+
+
+    <!-- ALERT SIMULATOR -->
+
+    <div class="card">
+
+        <h2>Alert Simulator</h2>
+
+        <div class="inputs">
+
+            <div>
+                <label>Location</label>
+                <input
+                    type="text"
+                    id="location"
+                    placeholder="Example: Guwahati"
+                >
+            </div>
+
+            <div>
+                <label>Rainfall (mm)</label>
+                <input
+                    type="number"
+                    id="rainfall"
+                    value="50"
+                >
+            </div>
+
+            <div>
+                <label>Flood Level (m)</label>
+                <input
+                    type="number"
+                    id="flood"
+                    value="1"
+                    step="0.1"
+                >
+            </div>
+
+            <div>
+                <label>Landslide Risk (%)</label>
+                <input
+                    type="number"
+                    id="landslide"
+                    value="20"
+                    min="0"
+                    max="100"
+                >
+            </div>
+
+        </div>
+
+        <button onclick="generateAlert()">
+            🚨 Generate Alert
+        </button>
+
+
+        <div id="result" class="result">
+
+            <h3>Alert Result</h3>
+
+            <div id="severity" class="severity">
+                No alert generated
+            </div>
+
+            <p id="message" class="message">
+                Enter the environmental data and generate an alert.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- AUTOMATED TESTS -->
+
+    <div class="card">
+
+        <h2>🧪 Alert Rule Tests</h2>
+
+        <p class="subtitle">
+            Test different disaster scenarios automatically.
+        </p>
+
+        <div class="tests" id="tests"></div>
+
+        <button onclick="runTests()">
+            ▶ Run All Tests
+        </button>
+
+    </div>
+
+
+    <!-- ALERT HISTORY -->
+
+    <div class="card">
+
+        <h2>📋 Alert Test History</h2>
+
+        <div id="history" class="history">
+            No alerts tested yet.
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+        SURAKSHA NER
+        Alert Testing Engine
+
+        This is a frontend testing module.
+        It does not modify the existing backend.
+    */
+
+
+    function calculateRisk(rainfall, flood, landslide) {
+
+        let score = 0;
+
+
+        // Rainfall contribution
+
+        if (rainfall >= 200) {
+            score += 40;
+        }
+        else if (rainfall >= 100) {
+            score += 30;
+        }
+        else if (rainfall >= 50) {
+            score += 15;
+        }
+
+
+        // Flood contribution
+
+        if (flood >= 3) {
+            score += 35;
+        }
+        else if (flood >= 2) {
+            score += 25;
+        }
+        else if (flood >= 1) {
+            score += 10;
+        }
+
+
+        // Landslide contribution
+
+        if (landslide >= 80) {
+            score += 30;
+        }
+        else if (landslide >= 60) {
+            score += 25;
+        }
+        else if (landslide >= 30) {
+            score += 15;
+        }
+
+
+        return score;
+    }
+
+
+    function getSeverity(score) {
+
+        if (score >= 80) {
+            return "CRITICAL";
+        }
+
+        if (score >= 60) {
+            return "HIGH";
+        }
+
+        if (score >= 30) {
+            return "MODERATE";
+        }
+
+        return "LOW";
+    }
+
+
+    function generateAlert() {
+
+        const location =
+            document.getElementById("location").value || "Unknown Location";
+
+        const rainfall =
+            Number(document.getElementById("rainfall").value);
+
+        const flood =
+            Number(document.getElementById("flood").value);
+
+        const landslide =
+            Number(document.getElementById("landslide").value);
+
+
+        const score =
+            calculateRisk(
+                rainfall,
+                flood,
+                landslide
+            );
+
+
+        const severity =
+            getSeverity(score);
+
+
+        document.getElementById("severity").innerText =
+            severity + " ALERT";
+
+
+        document.getElementById("message").innerText =
+            `Location: ${location}
+             | Risk Score: ${score}
+             | Rainfall: ${rainfall} mm
+             | Flood Level: ${flood} m
+             | Landslide Risk: ${landslide}%`;
+
+
+        addHistory(
+            location,
+            severity,
+            score
+        );
+    }
+
+
+    function addHistory(
+        location,
+        severity,
+        score
+    ) {
+
+        const history =
+            document.getElementById("history");
+
+
+        if (
+            history.innerText ===
+            "No alerts tested yet."
+        ) {
+
+            history.innerHTML = "";
+
+        }
+
+
+        const item =
+            document.createElement("div");
+
+
+        item.className =
+            "history-item";
+
+
+        item.innerHTML =
+            `<strong>${severity} ALERT</strong>
+             — ${location}
+             — Risk Score: ${score}`;
+
+
+        history.prepend(item);
+    }
+
+
+    /*
+        AUTOMATED TEST CASES
+    */
+
+    const testCases = [
+
+        {
+            name: "Normal Weather",
+            rainfall: 20,
+            flood: 0.5,
+            landslide: 5,
+            expected: "LOW"
+        },
+
+        {
+            name: "Heavy Rain",
+            rainfall: 120,
+            flood: 1,
+            landslide: 20,
+            expected: "MODERATE"
+        },
+
+        {
+            name: "Flood Risk",
+            rainfall: 150,
+            flood: 2,
+            landslide: 40,
+            expected: "HIGH"
+        },
+
+        {
+            name: "Extreme Disaster",
+            rainfall: 250,
+            flood: 4,
+            landslide: 90,
+            expected: "CRITICAL"
+        }
+
+    ];
+
+
+    function runTests() {
+
+        const container =
+            document.getElementById("tests");
+
+
+        container.innerHTML = "";
+
+
+        testCases.forEach(test => {
+
+            const score =
+                calculateRisk(
+                    test.rainfall,
+                    test.flood,
+                    test.landslide
+                );
+
+
+            const actual =
+                getSeverity(score);
+
+
+            const passed =
+                actual === test.expected;
+
+
+            const div =
+                document.createElement("div");
+
+
+            div.className =
+                "test";
+
+
+            div.innerHTML = `
+
+                <span>
+                    ${test.name}
+                </span>
+
+                <span class="${passed ? "pass" : "fail"}">
+
+                    ${passed ? "✓ PASS" : "✗ FAIL"}
+
+                    (${actual})
+
+                </span>
+
+            `;
+
+
+            container.appendChild(div);
+
+        });
+
+    }
+
+</script>
+
+</body>
+</html>
