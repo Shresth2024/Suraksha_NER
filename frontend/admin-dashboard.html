@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin | SURAKSHA NER</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="topbar appbar admin">
+    <a class="brand" href="admin-dashboard.html">
+        <span class="brand-mark">N</span>
+        NER<span class="accent">-SAFE</span>
+        <em>ADMIN</em>
+    </a>
+
+    <nav>
+        <a class="active" href="admin-dashboard.html">Overview</a>
+        <a href="admin-map.html">Risk Map</a>
+        <a href="admin-alerts.html">Alerts</a>
+        <a href="admin-users.html">Users</a>
+    </nav>
+
+    <a class="btn btn-light" href="dashboard.html">User view</a>
+</header>
+
+
+<main class="main">
+
+    <!-- PAGE HEADER -->
+    <div class="page-head">
+        <div>
+            <span class="eyebrow">ADMIN CONTROL CENTER</span>
+            <h1>Risk monitoring overview</h1>
+            <p>Live overview of monitored zones, users and alerts.</p>
+        </div>
+
+        <span class="ok">● System online</span>
+    </div>
+
+
+    <!-- STAT CARDS -->
+    <div class="stats">
+
+        <div>
+            <span>Monitored zones</span>
+            <strong id="adminZones">—</strong>
+            <small>Active risk zones</small>
+        </div>
+
+        <div>
+            <span>High / Critical</span>
+            <strong id="adminHighCritical">—</strong>
+            <small>Need attention</small>
+        </div>
+
+        <div>
+            <span>Active alerts</span>
+            <strong id="adminActiveAlerts">—</strong>
+            <small>Currently active</small>
+        </div>
+
+        <div>
+            <span>Registered users</span>
+            <strong id="adminUsers">—</strong>
+            <small>From database</small>
+        </div>
+
+    </div>
+
+
+    <!-- RISK + ALERTS -->
+    <div class="grid2">
+
+        <!-- RISK DISTRIBUTION -->
+        <section class="card">
+
+            <div class="card-head">
+                <h2>Risk distribution</h2>
+                <a class="link" href="admin-map.html">Open map</a>
+            </div>
+
+            <div class="bars">
+
+                <p>
+                    Low
+                    <i id="barLow" style="width:0%"></i>
+                    <b id="countLow">0</b>
+                </p>
+
+                <p>
+                    Moderate
+                    <i id="barModerate" style="width:0%"></i>
+                    <b id="countModerate">0</b>
+                </p>
+
+                <p>
+                    High
+                    <i id="barHigh" style="width:0%"></i>
+                    <b id="countHigh">0</b>
+                </p>
+
+                <p>
+                    Critical
+                    <i id="barCritical" style="width:0%"></i>
+                    <b id="countCritical">0</b>
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- RECENT ALERTS -->
+        <section class="card">
+
+            <div class="card-head">
+                <h2>Recent alerts</h2>
+                <a class="link" href="admin-alerts.html">Manage</a>
+            </div>
+
+            <div id="recentAdminAlerts">
+
+                <div class="admin-row">
+                    <span>
+                        <b>Loading alerts...</b>
+                        <small>Please wait</small>
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<script src="js/script.js"></script>
+
+
+<script>
+/*
+    SURAKSHA NER
+    Admin dashboard data loader
+*/
+
+async function loadAdminDashboardData() {
+
+    try {
+
+        /* -------------------------
+           ADMIN SUMMARY
+        ------------------------- */
+
+        const summary = await api('/admin/summary/');
+
+        /*
+          We already confirmed that this API
+          returns status 200.
+        */
+
+        document.getElementById('adminUsers').textContent =
+            summary.users ?? 0;
+
+        document.getElementById('adminActiveAlerts').textContent =
+            summary.active_alerts ?? 0;
+
+        document.getElementById('adminHighCritical').textContent =
+            summary.high_critical_zones ?? 0;
+
+
+        /* -------------------------
+           RISK ZONES
+        ------------------------- */
+
+        const zonesData = await api('/risk-zones/');
+
+        const zones = zonesData.results || [];
+
+        document.getElementById('adminZones').textContent =
+            zones.length;
+
+
+        let low = 0;
+        let moderate = 0;
+        let high = 0;
+        let critical = 0;
+
+        zones.forEach(zone => {
+
+            const level = String(zone.risk_level || '').toUpperCase();
+
+            if (level === 'LOW') low++;
+            else if (level === 'MODERATE') moderate++;
+            else if (level === 'HIGH') high++;
+            else if (level === 'CRITICAL') critical++;
+
+        });
+
+
+        /* -------------------------
+           RISK COUNTS
+        ------------------------- */
+
+        document.getElementById('countLow').textContent = low;
+        document.getElementById('countModerate').textContent = moderate;
+        document.getElementById('countHigh').textContent = high;
+        document.getElementById('countCritical').textContent = critical;
+
+
+        /* -------------------------
+           RISK BAR WIDTHS
+        ------------------------- */
+
+        const total =
+            low + moderate + high + critical;
+
+        if (total > 0) {
+
+            document.getElementById('barLow').style.width =
+                ((low / total) * 100) + '%';
+
+            document.getElementById('barModerate').style.width =
+                ((moderate / total) * 100) + '%';
+
+            document.getElementById('barHigh').style.width =
+                ((high / total) * 100) + '%';
+
+            document.getElementById('barCritical').style.width =
+                ((critical / total) * 100) + '%';
+
+        }
+
+
+        /* -------------------------
+           RECENT ALERTS
+        ------------------------- */
+
+        const alertsData = await api('/admin/alerts/');
+
+        const alerts = alertsData.results || [];
+
+        const container =
+            document.getElementById('recentAdminAlerts');
+
+        container.innerHTML = '';
+
+
+        if (alerts.length === 0) {
+
+            container.innerHTML = `
+                <div class="admin-row">
+                    <span>
+                        <b>No active alerts</b>
+                        <small>No recent alerts in the database</small>
+                    </span>
+                </div>
+            `;
+
+        } else {
+
+            alerts.slice(0, 5).forEach(alert => {
+
+                const level =
+                    String(alert.risk_level || 'LOW').toUpperCase();
+
+                let icon = '🟢';
+
+                if (level === 'MODERATE') icon = '🟠';
+                if (level === 'HIGH') icon = '🔴';
+                if (level === 'CRITICAL') icon = '🟣';
+
+
+                const row =
+                    document.createElement('div');
+
+                row.className = 'admin-row';
+
+                row.innerHTML = `
+                    ${icon}
+                    <span>
+                        <b>${alert.title || alert.hazard_type}</b>
+                        <small>
+                            ${alert.user_name || 'User'}
+                            ·
+                            ${formatTime(alert.created_at)}
+                        </small>
+                    </span>
+                    <em>${level}</em>
+                `;
+
+                container.appendChild(row);
+
+            });
+
+        }
+
+    } catch (error) {
+
+        console.error('Admin dashboard error:', error);
+
+        toast(
+            'Unable to load live admin data.'
+        );
+
+    }
+
+}
+
+
+/*
+   Run after the page loads.
+*/
+
+document.addEventListener(
+    'DOMContentLoaded',
+    loadAdminDashboardData
+);
+</script>
+
+</body>
+</html>

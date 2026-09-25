@@ -1,0 +1,36 @@
+SURAKSHA NER END-TO-END
+
+FRONTEND
+  index/register/login/dashboard/map/alerts/profile/admin pages
+        |
+        v
+DJANGO REST API
+  authentication
+  profile
+  location
+  risk zones
+  current risk
+  alerts
+  admin summary/users/alerts
+        |
+        v
+SQLITE DATABASE
+        |
+        +--> RISK ZONES
+        |
+        +--> USER LOCATION
+                 |
+                 v
+             GEOFENCING
+                 |
+          +------+------ +
+          |             |
+        OUTSIDE        INSIDE
+          |             |
+       NO ALERT       ALERT
+
+NEXT STAGE
+  Replace seeded risk zones with verified weather/GIS/satellite data.
+  Replace demo scoring with a validated ML model.
+  Add push notifications/PWA/mobile background location.
+  Add authorized SMS/telecom integrations only for production.

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Admin Users | SURAKSHA NER</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="topbar appbar admin">
+
+    <a class="brand" href="admin-dashboard.html">
+        <span class="brand-mark">N</span>
+        NER<span class="accent">-SAFE</span>
+        <em>ADMIN</em>
+    </a>
+
+    <nav>
+        <a href="admin-dashboard.html">Overview</a>
+        <a href="admin-map.html">Risk Map</a>
+        <a href="admin-alerts.html">Alerts</a>
+        <a class="active" href="admin-users.html">Users</a>
+    </nav>
+
+    <a class="btn btn-light" href="dashboard.html">User view</a>
+
+</header>
+
+
+<main class="main">
+
+    <div class="page-head">
+
+        <div>
+            <span class="eyebrow">USER MONITORING</span>
+            <h1>Registered users</h1>
+            <p>Live users registered in the SURAKSHA NER system.</p>
+        </div>
+
+        <div class="search">
+            ⌕
+            <input id="userSearch" placeholder="Search user">
+        </div>
+
+    </div>
+
+
+    <div class="table-wrap card">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Location</th>
+                    <th>Location access</th>
+                    <th>Alerts</th>
+                    <th>Last active</th>
+                </tr>
+            </thead>
+
+            <tbody id="usersTable">
+
+                <tr>
+                    <td colspan="5">
+                        Loading users...
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
+
+<script src="js/script.js"></script>
+
+
+<script>
+
+let allUsers = [];
+
+
+/* -----------------------------
+   LOAD USERS FROM DJANGO
+----------------------------- */
+
+async function loadAdminUsers() {
+
+    try {
+
+        const data = await api('/admin/users/');
+
+        allUsers = data.results || [];
+
+        renderUsers(allUsers);
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById('usersTable').innerHTML = `
+            <tr>
+                <td colspan="5">
+                    Unable to load users.
+                </td>
+            </tr>
+        `;
+
+        toast(error.message);
+
+    }
+
+}
+
+
+/* -----------------------------
+   DISPLAY USERS
+----------------------------- */
+
+function renderUsers(users) {
+
+    const tbody = document.getElementById('usersTable');
+
+    tbody.innerHTML = '';
+
+
+    if (users.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    No registered users found.
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    users.forEach(user => {
+
+        const tr = document.createElement('tr');
+
+        const location =
+            user.preferred_area || 'Location not provided';
+
+        const locationStatus =
+            user.location_enabled
+                ? 'Enabled'
+                : 'Limited';
+
+        const locationClass =
+            user.location_enabled
+                ? 'ok'
+                : 'pending';
+
+        tr.innerHTML = `
+
+            <td>
+                <b>${escapeHTML(user.name || 'User')}</b>
+                <small>${escapeHTML(user.email || '')}</small>
+            </td>
+
+            <td>
+                ${escapeHTML(location)}
+            </td>
+
+            <td class="${locationClass}">
+                ${locationStatus}
+            </td>
+
+            <td>
+                All
+            </td>
+
+            <td>
+                ${formatTime(user.last_location_at)}
+            </td>
+
+        `;
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+
+/* -----------------------------
+   SEARCH USERS
+----------------------------- */
+
+document
+    .getElementById('userSearch')
+    .addEventListener('input', function () {
+
+        const search =
+            this.value.toLowerCase().trim();
+
+        const filtered =
+            allUsers.filter(user => {
+
+                const name =
+                    String(user.name || '').toLowerCase();
+
+                const email =
+                    String(user.email || '').toLowerCase();
+
+                const area =
+                    String(user.preferred_area || '').toLowerCase();
+
+                return (
+                    name.includes(search) ||
+                    email.includes(search) ||
+                    area.includes(search)
+                );
+
+            });
+
+        renderUsers(filtered);
+
+    });
+
+
+/* -----------------------------
+   BASIC HTML SAFETY
+----------------------------- */
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+}
+
+
+/* -----------------------------
+   START
+----------------------------- */
+
+document.addEventListener(
+    'DOMContentLoaded',
+    loadAdminUsers
+);
+
+</script>
+
+</body>
+</html>

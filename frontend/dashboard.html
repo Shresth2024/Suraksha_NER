@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard | SURAKSHA NER</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="topbar appbar">
+
+    <a class="brand" href="dashboard.html">
+        <span class="brand-mark">N</span>
+        NER<span class="accent">-SAFE</span>
+    </a>
+
+    <nav>
+        <a class="active" href="dashboard.html">Dashboard</a>
+        <a href="map.html">Risk Map</a>
+        <a href="alerts.html">
+            Alerts <b class="badge">LIVE</b>
+        </a>
+        <a href="safety.html">Safety</a>
+    </nav>
+
+    <div class="nav-actions">
+        <a class="round" href="settings.html">⚙</a>
+        <a class="avatar" href="profile.html">JK</a>
+    </div>
+
+</header>
+
+
+<main class="main">
+
+    <!-- PAGE HEADER -->
+
+    <div class="page-head">
+
+        <div>
+
+            <span class="eyebrow">
+                PERSONAL SAFETY DASHBOARD
+            </span>
+
+            <h1 id="welcomeTitle">
+                Good evening
+            </h1>
+
+            <p>
+                Your alert profile and nearby risk information.
+            </p>
+
+        </div>
+
+        <a class="btn btn-outline" href="map.html">
+            Open live map →
+        </a>
+
+    </div>
+
+
+    <!-- RISK BANNER -->
+
+    <div
+        class="banner"
+        id="riskBanner"
+        style="display:none;">
+
+        <b>!</b>
+
+        <div>
+
+            <strong id="bannerTitle">
+                Risk detected
+            </strong>
+
+            <p id="bannerMessage">
+                Loading risk information...
+            </p>
+
+        </div>
+
+        <a href="alerts.html">
+            View alert →
+        </a>
+
+    </div>
+
+
+    <!-- MAIN CARDS -->
+
+    <div class="grid2">
+
+
+        <!-- LOCATION CARD -->
+
+        <section class="card">
+
+            <div class="card-head">
+
+                <h3>
+                    📍 Current location
+                </h3>
+
+                <a class="link" href="profile.html">
+                    Manage
+                </a>
+
+            </div>
+
+
+            <div class="location">
+
+                <span>⌖</span>
+
+                <div>
+
+                    <h2 id="locationText">
+                        Checking location...
+                    </h2>
+
+                    <p>
+
+                        Location access:
+                        <em id="locationAccess">
+                            Checking
+                        </em>
+
+                        <br>
+
+                        Last updated:
+                        <span id="lastLocation">
+                            —
+                        </span>
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- LOCATION BUTTONS -->
+
+            <div style="
+                display:flex;
+                gap:10px;
+                flex-wrap:wrap;
+                margin-top:12px;
+            ">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    id="refreshLocationBtn"
+                    onclick="simulateLocation()"
+                    style="flex:1;">
+
+                    📍 My Location
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    id="demoLocationBtn"
+                    onclick="useDemoLocation()"
+                    style="flex:1;">
+
+                    🧪 Demo: Guwahati HIGH Risk
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- OFFICIAL ALERTS -->
+
+        <section class="card" id="officialAlertsCard">
+
+            <h2>
+                🚨 Official NER Alerts
+            </h2>
+
+            <div id="officialAlertsList">
+
+                <p>
+                    Loading official alerts...
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- CURRENT RISK -->
+
+        <section class="card">
+
+            <div class="card-head">
+
+                <h3>
+                    Current risk
+                </h3>
+
+                <span
+                    id="riskPill"
+                    class="risk-pill low">
+
+                    LOW
+
+                </span>
+
+            </div>
+
+
+            <div class="big-score">
+
+                <span id="riskScore">
+                    —
+                </span>
+
+                <small>
+                    /100
+                </small>
+
+            </div>
+
+
+            <div class="meter">
+
+                <i
+                    id="riskMeter"
+                    style="width:0%">
+                </i>
+
+            </div>
+
+
+            <div class="rows">
+
+                <span>
+                    Rainfall
+                    <b id="rainfallRisk">—</b>
+                </span>
+
+                <span>
+                    Soil moisture
+                    <b id="soilRisk">—</b>
+                </span>
+
+                <span>
+                    Terrain
+                    <b id="terrainRisk">—</b>
+                </span>
+
+                <span>
+                    Ground movement
+                    <b id="groundRisk">—</b>
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- LIVE DATA -->
+
+        <section class="card live-data-card">
+
+            <div class="card-head">
+
+                <h3>
+                    🌐 Live conditions
+                </h3>
+
+                <span
+                    class="live-data-badge"
+                    id="liveDataStatus">
+
+                    CONNECTING
+
+                </span>
+
+            </div>
+
+            <div class="live-grid">
+
+                <div>
+                    <small>Temperature</small>
+                    <strong id="liveTemp">—</strong>
+                </div>
+
+                <div>
+                    <small>Humidity</small>
+                    <strong id="liveHumidity">—</strong>
+                </div>
+
+                <div>
+                    <small>Rainfall</small>
+                    <strong id="liveRain">—</strong>
+                </div>
+
+                <div>
+                    <small>Wind</small>
+                    <strong id="liveWind">—</strong>
+                </div>
+
+            </div>
+
+            <div
+                class="source-line"
+                id="liveDataSource">
+
+                Waiting for live weather data…
+
+            </div>
+
+            <div
+                class="official-alert-mini"
+                id="officialAlertMini">
+
+                SACHET / NDMA: checking configured feed…
+
+            </div>
+
+        </section>
+
+
+        <!-- ACTIVE ALERTS -->
+
+        <section class="card">
+
+            <div class="card-head">
+
+                <h3>
+                    Active alerts
+                </h3>
+
+                <a class="link" href="alerts.html">
+                    View all
+                </a>
+
+            </div>
+
+
+            <div id="dashboardAlerts">
+
+                <div class="alert-row">
+
+                    🔵
+
+                    <div>
+
+                        <b>
+                            Checking alerts...
+                        </b>
+
+                        <small>
+                            Please wait
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- SAFETY STATUS -->
+
+        <section class="card">
+
+            <div class="card-head">
+
+                <h3>
+                    Safety status
+                </h3>
+
+                <span
+                    class="ok"
+                    id="safetyStatus">
+
+                    ● Checking
+
+                </span>
+
+            </div>
+
+
+            <ul class="checks">
+
+                <li id="notificationStatus">
+                    ✓ Checking notification settings
+                </li>
+
+                <li id="locationStatus">
+                    ✓ Checking location permission
+                </li>
+
+                <li>
+                    ✓ Emergency contacts available
+                </li>
+
+            </ul>
+
+
+            <a
+                class="link"
+                href="settings.html">
+
+                Manage notification settings →
+
+            </a>
+
+        </section>
+
+    </div>
+
+
+    <!-- ===============================================
+         LIVE INTELLIGENCE
+    ================================================ -->
+
+    <div class="section-title left">
+
+        <span class="eyebrow">
+            LIVE INTELLIGENCE
+        </span>
+
+        <h2>
+            Weather + AI + GIS
+        </h2>
+
+    </div>
+
+
+    <section class="card">
+
+        <div class="live-grid">
+
+            <!-- LIVE RAINFALL -->
+
+            <div>
+                <small>
+                    🌧️ Live Rainfall
+                </small>
+
+                <strong id="waiRainfall">
+                    —
+                </strong>
+            </div>
+
+
+            <!-- HUMIDITY -->
+
+            <div>
+                <small>
+                    💧 Humidity
+                </small>
+
+                <strong id="waiHumidity">
+                    —
+                </strong>
+            </div>
+
+
+            <!-- TEMPERATURE -->
+
+            <div>
+                <small>
+                    🌡️ Temperature
+                </small>
+
+                <strong id="waiTemperature">
+                    —
+                </strong>
+            </div>
+
+
+            <!-- WIND -->
+
+            <div>
+                <small>
+                    💨 Wind
+                </small>
+
+                <strong id="waiWind">
+                    —
+                </strong>
+            </div>
+
+
+            <!-- AI PREDICTION -->
+
+            <div>
+                <small>
+                    🤖 AI Prediction
+                </small>
+
+                <strong id="waiAIPrediction">
+                    —
+                </strong>
+            </div>
+
+
+            <!-- GIS ZONE -->
+
+            <div>
+                <small>
+                    🗺️ GIS Zone
+                </small>
+
+                <strong id="waiGISZone">
+                    No active zone
+                </strong>
+            </div>
+
+
+            <!-- GEOFENCE -->
+
+            <div>
+                <small>
+                    📐 Geofence
+                </small>
+
+                <strong id="waiGeofence">
+                    —
+                </strong>
+            </div>
+
+
+            <!-- DISTANCE -->
+
+            <div>
+                <small>
+                    📍 Distance
+                </small>
+
+                <strong id="waiDistance">
+                    —
+                </strong>
+            </div>
+
+
+            <!-- WEATHER SCORE -->
+
+            <div>
+                <small>
+                    🌦️ Weather Score
+                </small>
+
+                <strong id="waiWeatherScore">
+                    —
+                </strong>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- RISK SNAPSHOT -->
+
+    <div class="section-title left">
+
+        <span class="eyebrow">
+            RISK SNAPSHOT
+        </span>
+
+        <h2>
+            Nearby conditions
+        </h2>
+
+    </div>
+
+
+    <div
+        class="hazards"
+        id="hazardSnapshot">
+
+        <div class="hazard">
+
+            🌧️
+
+            <div>
+
+                <b>Rainfall</b>
+
+                <strong>—</strong>
+
+                <small>
+                    Loading...
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="hazard">
+
+            ⛰️
+
+            <div>
+
+                <b>Landslide</b>
+
+                <strong>—</strong>
+
+                <small>
+                    Loading...
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="hazard">
+
+            🌊
+
+            <div>
+
+                <b>Flood</b>
+
+                <strong>—</strong>
+
+                <small>
+                    Loading...
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script src="js/script.js"></script>
+
+
+<script>
+
+/* =====================================================
+   SAFE HTML ESCAPE
+===================================================== */
+
+function dashboardEscapeHTML(value) {
+
+    const div = document.createElement("div");
+
+    div.textContent = value ?? "";
+
+    return div.innerHTML;
+
+}
+
+
+/* =====================================================
+   DEMO LOCATION
+   GUWAHATI HIGH-RISK ZONE
+===================================================== */
+
+async function useDemoLocation() {
+
+    if (!getToken()) {
+
+        window.location.href = "login.html";
+
+        return;
+
+    }
+
+
+    const demoLocation = {
+
+        latitude: 26.1445,
+
+        longitude: 91.7362
+
+    };
+
+
+    const button =
+        document.getElementById("demoLocationBtn");
+
+
+    try {
+
+        if (button) {
+
+            button.disabled = true;
+
+            button.textContent =
+                "⏳ Checking risk...";
+
+        }
+
+
+        toast(
+            "🧪 Applying Guwahati demo location..."
+        );
+
+
+        const data = await api(
+            "/location/",
+            {
+
+                method: "POST",
+
+                body: JSON.stringify(
+                    demoLocation
+                )
+
+            }
+        );
+
+
+        console.log(
+            "Demo location response:",
+            data
+        );
+
+
+        if (
+            data.new_alerts &&
+            data.new_alerts.length > 0
+        ) {
+
+            toast(
+                "🚨 HIGH RISK ALERT CREATED!"
+            );
+
+        } else {
+
+            toast(
+                "📍 Demo location applied."
+            );
+
+        }
+
+
+        await loadLiveDashboard();
+
+
+    } catch (error) {
+
+        console.error(
+            "Demo location error:",
+            error
+        );
+
+
+        toast(
+            error.message ||
+            "Demo location failed"
+        );
+
+
+    } finally {
+
+        if (button) {
+
+            button.disabled = false;
+
+            button.textContent =
+                "🧪 Demo: Guwahati HIGH Risk";
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   UPDATE WEATHER + AI + GIS
+===================================================== */
+
+function updateWeatherAIGIS(risk) {
+
+    console.log(
+        "Updating Weather + AI + GIS:",
+        risk
+    );
+
+
+    const live =
+        risk.live_data || {};
+
+    const ai =
+        risk.ai_prediction || {};
+
+    const matched =
+        risk.matched_zone || {};
+
+
+    /* =========================================
+       LIVE WEATHER
+    ========================================= */
+
+    const rainfall =
+        Number(
+            live.rainfall_mm ?? 0
+        );
+
+
+    const humidity =
+        Number(
+            live.humidity_percent ?? 0
+        );
+
+
+    const temperature =
+        live.temperature_c;
+
+
+    const wind =
+        live.wind_kmh;
+
+
+    const rainfallElement =
+        document.getElementById(
+            "waiRainfall"
+        );
+
+
+    if (rainfallElement) {
+
+        rainfallElement.textContent =
+            `${rainfall.toFixed(1)} mm`;
+
+    }
+
+
+    const humidityElement =
+        document.getElementById(
+            "waiHumidity"
+        );
+
+
+    if (humidityElement) {
+
+        humidityElement.textContent =
+            `${humidity.toFixed(0)}%`;
+
+    }
+
+
+    const temperatureElement =
+        document.getElementById(
+            "waiTemperature"
+        );
+
+
+    if (temperatureElement) {
+
+        temperatureElement.textContent =
+            temperature != null
+                ? `${Number(temperature).toFixed(1)}°C`
+                : "—";
+
+    }
+
+
+    const windElement =
+        document.getElementById(
+            "waiWind"
+        );
+
+
+    if (windElement) {
+
+        windElement.textContent =
+            wind != null
+                ? `${Number(wind).toFixed(1)} km/h`
+                : "—";
+
+    }
+
+
+    /* =========================================
+       AI PREDICTION
+    ========================================= */
+
+    const aiElement =
+        document.getElementById(
+            "waiAIPrediction"
+        );
+
+
+    if (
+        aiElement &&
+        ai.score != null
+    ) {
+
+        aiElement.textContent =
+            `${Number(ai.score).toFixed(2)}/100`;
+
+    }
+
+
+    /* =========================================
+       WEATHER SCORE
+    ========================================= */
+
+    let rainfallScore = 0;
+
+
+    if (rainfall >= 60) {
+
+        rainfallScore = 100;
+
+    }
+    else if (rainfall >= 40) {
+
+        rainfallScore = 80;
+
+    }
+    else if (rainfall >= 20) {
+
+        rainfallScore = 60;
+
+    }
+    else if (rainfall >= 10) {
+
+        rainfallScore = 40;
+
+    }
+    else if (rainfall > 0) {
+
+        rainfallScore = 20;
+
+    }
+
+
+    let humidityScore = 0;
+
+
+    if (humidity >= 90) {
+
+        humidityScore = 100;
+
+    }
+    else if (humidity >= 80) {
+
+        humidityScore = 70;
+
+    }
+    else if (humidity >= 70) {
+
+        humidityScore = 40;
+
+    }
+
+
+    const weatherScore =
+        (rainfallScore * 0.75) +
+        (humidityScore * 0.25);
+
+
+    const weatherElement =
+        document.getElementById(
+            "waiWeatherScore"
+        );
+
+
+    if (weatherElement) {
+
+        weatherElement.textContent =
+            `${Math.round(weatherScore)}/100`;
+
+    }
+
+
+    /* =========================================
+       GIS ZONE
+    ========================================= */
+
+    const gisElement =
+        document.getElementById(
+            "waiGISZone"
+        );
+
+
+    if (gisElement) {
+
+        gisElement.textContent =
+            matched.name ||
+            "No active zone";
+
+    }
+
+
+    /* =========================================
+       GEOFENCE
+    ========================================= */
+
+    const geofenceElement =
+        document.getElementById(
+            "waiGeofence"
+        );
+
+
+    if (geofenceElement) {
+
+        if (
+            matched.inside_polygon === true
+        ) {
+
+            geofenceElement.textContent =
+                "INSIDE";
+
+        }
+        else if (
+            matched.inside_polygon === false
+        ) {
+
+            geofenceElement.textContent =
+                "OUTSIDE";
+
+        }
+        else {
+
+            geofenceElement.textContent =
+                "—";
+
+        }
+
+    }
+
+
+    /* =========================================
+       DISTANCE
+    ========================================= */
+
+    const distanceElement =
+        document.getElementById(
+            "waiDistance"
+        );
+
+
+    if (distanceElement) {
+
+        distanceElement.textContent =
+            matched.distance_km != null
+                ? `${Number(
+                    matched.distance_km
+                  ).toFixed(2)} km`
+                : "—";
+
+    }
+
+
+    console.log(
+        "✅ Weather + AI + GIS updated"
+    );
+
+}
+
+
+/* =====================================================
+   DASHBOARD LOADER
+===================================================== */
+
+async function loadLiveDashboard() {
+
+    if (!getToken()) {
+
+        window.location.href = "login.html";
+
+        return;
+
+    }
+
+
+    try {
+
+        const user =
+            await loadMe();
+
+
+        if (!user)
+            return;
+
+
+        /* =============================================
+           USER NAME
+        ============================================= */
+
+        const welcome =
+            document.getElementById(
+                "welcomeTitle"
+            );
+
+
+        if (welcome) {
+
+            welcome.textContent =
+                "Good evening, " +
+                (user.name || "there");
+
+        }
+
+
+        /* =============================================
+           LOCATION
+        ============================================= */
+
+        const locationText =
+            document.getElementById(
+                "locationText"
+            );
+
+
+        const locationAccess =
+            document.getElementById(
+                "locationAccess"
+            );
+
+
+        const lastLocation =
+            document.getElementById(
+                "lastLocation"
+            );
+
+
+        if (
+            user.latitude !== null &&
+            user.latitude !== undefined &&
+            user.longitude !== null &&
+            user.longitude !== undefined
+        ) {
+
+            if (locationText) {
+
+                locationText.textContent =
+                    `${Number(
+                        user.latitude
+                    ).toFixed(4)}, ${Number(
+                        user.longitude
+                    ).toFixed(4)}`;
+
+            }
+
+
+            if (locationAccess) {
+
+                locationAccess.textContent =
+                    user.location_enabled
+                        ? "Enabled"
+                        : "Disabled";
+
+            }
+
+
+            if (lastLocation) {
+
+                lastLocation.textContent =
+                    user.last_location_at
+                        ? formatTime(
+                            user.last_location_at
+                        )
+                        : "Just now";
+
+            }
+
+        }
+        else {
+
+            if (locationText) {
+
+                locationText.textContent =
+                    "Location not available";
+
+            }
+
+
+            if (locationAccess) {
+
+                locationAccess.textContent =
+                    "Not enabled";
+
+            }
+
+
+            if (lastLocation) {
+
+                lastLocation.textContent =
+                    "—";
+
+            }
+
+        }
+
+
+        /* =============================================
+           CURRENT RISK
+        ============================================= */
+
+        if (
+            user.latitude !== null &&
+            user.latitude !== undefined &&
+            user.longitude !== null &&
+            user.longitude !== undefined
+        ) {
+
+            const risk =
+                await api(
+                    `/risk/current/?lat=${encodeURIComponent(
+                        user.latitude
+                    )}&lon=${encodeURIComponent(
+                        user.longitude
+                    )}`
+                );
+
+
+            console.log(
+                "CURRENT RISK RESPONSE:",
+                risk
+            );
+
+
+            /* =========================================
+               WEATHER + AI + GIS
+            ========================================= */
+
+            updateWeatherAIGIS(
+                risk
+            );
+
+
+            /* =========================================
+               RISK SCORE
+            ========================================= */
+
+            const score =
+                Number(
+                    risk.risk_score ?? 0
+                );
+
+
+            const level =
+                String(
+                    risk.risk_level ||
+                    "LOW"
+                ).toUpperCase();
+
+
+            const riskScore =
+                document.getElementById(
+                    "riskScore"
+                );
+
+
+            if (riskScore) {
+
+                riskScore.textContent =
+                    score;
+
+            }
+
+
+            const riskMeter =
+                document.getElementById(
+                    "riskMeter"
+                );
+
+
+            if (riskMeter) {
+
+                riskMeter.style.width =
+                    Math.min(
+                        Math.max(
+                            score,
+                            0
+                        ),
+                        100
+                    ) + "%";
+
+            }
+
+
+            /* =========================================
+               RISK PILL
+            ========================================= */
+
+            const riskPill =
+                document.getElementById(
+                    "riskPill"
+                );
+
+
+            if (riskPill) {
+
+                riskPill.textContent =
+                    level;
+
+                riskPill.className =
+                    "risk-pill " +
+                    riskClass(level);
+
+            }
+
+
+            /* =========================================
+               RISK BANNER
+            ========================================= */
+
+            const banner =
+                document.getElementById(
+                    "riskBanner"
+                );
+
+
+            if (banner) {
+
+                if (
+                    level === "HIGH" ||
+                    level === "CRITICAL"
+                ) {
+
+                    banner.style.display =
+                        "flex";
+
+
+                    const bannerTitle =
+                        document.getElementById(
+                            "bannerTitle"
+                        );
+
+
+                    if (bannerTitle) {
+
+                        bannerTitle.textContent =
+                            `${level} risk conditions detected`;
+
+                    }
+
+
+                    const bannerMessage =
+                        document.getElementById(
+                            "bannerMessage"
+                        );
+
+
+                    if (bannerMessage) {
+
+                        bannerMessage.textContent =
+                            risk.reason ||
+                            "Hazard conditions have been detected near your location.";
+
+                    }
+
+                }
+                else {
+
+                    banner.style.display =
+                        "none";
+
+                }
+
+            }
+
+
+            /* =========================================
+               HAZARDS
+            ========================================= */
+
+            const hazards =
+                risk.hazards || [];
+
+
+            const rainfall =
+                document.getElementById(
+                    "rainfallRisk"
+                );
+
+
+            const soil =
+                document.getElementById(
+                    "soilRisk"
+                );
+
+
+            const terrain =
+                document.getElementById(
+                    "terrainRisk"
+                );
+
+
+            const ground =
+                document.getElementById(
+                    "groundRisk"
+                );
+
+
+            if (rainfall)
+                rainfall.textContent = "—";
+
+
+            if (soil)
+                soil.textContent = "—";
+
+
+            if (terrain)
+                terrain.textContent = "—";
+
+
+            if (ground)
+                ground.textContent = "—";
+
+
+            /* =========================================
+               AI / ML MODEL INPUTS
+            ========================================= */
+
+            const inputs =
+                risk.model_inputs || {};
+
+
+            if (rainfall) {
+
+                const value =
+                    Number(
+                        inputs.rainfall || 0
+                    );
+
+
+                rainfall.textContent =
+                    value > 0
+                        ? `${value.toFixed(1)} mm`
+                        : "LOW";
+
+            }
+
+
+            if (soil) {
+
+                const value =
+                    Number(
+                        inputs.soil_moisture || 0
+                    );
+
+
+                soil.textContent =
+                    `${value}/100`;
+
+            }
+
+
+            if (terrain) {
+
+                const value =
+                    Number(
+                        inputs.terrain || 0
+                    );
+
+
+                terrain.textContent =
+                    `${value}/100`;
+
+            }
+
+
+            if (ground) {
+
+                const value =
+                    Number(
+                        inputs.ground_movement || 0
+                    );
+
+
+                ground.textContent =
+                    `${value}/100`;
+
+            }
+
+
+            /* =========================================
+               RISK SNAPSHOT
+            ========================================= */
+
+            const snapshot =
+                document.getElementById(
+                    "hazardSnapshot"
+                );
+
+
+            if (snapshot) {
+
+                snapshot.innerHTML =
+                    "";
+
+
+                const wanted = [
+
+                    [
+                        "rain",
+                        "🌧️",
+                        "Rainfall"
+                    ],
+
+                    [
+                        "landslide",
+                        "⛰️",
+                        "Landslide"
+                    ],
+
+                    [
+                        "flood",
+                        "🌊",
+                        "Flood"
+                    ]
+
+                ];
+
+
+                wanted.forEach(
+                    item => {
+
+                        const match =
+                            hazards.find(
+                                h =>
+                                    String(
+                                        h.hazard_type ||
+                                        ""
+                                    )
+                                    .toLowerCase()
+                                    .includes(
+                                        item[0]
+                                    )
+                            );
+
+
+                        const hazardLevel =
+                            match
+                                ? String(
+                                    match.risk_level ||
+                                    "LOW"
+                                ).toUpperCase()
+                                : "LOW";
+
+
+                        const reason =
+                            match?.reason ||
+                            "No active local warning";
+
+
+                        snapshot.innerHTML += `
+
+                            <div class="hazard">
+
+                                ${item[1]}
+
+                                <div>
+
+                                    <b>
+                                        ${item[2]}
+                                    </b>
+
+                                    <strong>
+                                        ${dashboardEscapeHTML(
+                                            hazardLevel
+                                        )}
+                                    </strong>
+
+                                    <small>
+                                        ${dashboardEscapeHTML(
+                                            reason
+                                        )}
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+                );
+
+            }
+
+        }
+
+
+        /* =============================================
+           LIVE WEATHER DATA
+        ============================================= */
+
+        if (
+            user.latitude !== null &&
+            user.latitude !== undefined &&
+            user.longitude !== null &&
+            user.longitude !== undefined
+        ) {
+
+            await loadLiveData(
+                user.latitude,
+                user.longitude
+            );
+
+        }
+
+
+        /* =============================================
+           ALERTS
+        ============================================= */
+
+        const alertData =
+            await api(
+                "/alerts/"
+            );
+
+
+        const alerts =
+            alertData.results || [];
+
+
+        const alertBox =
+            document.getElementById(
+                "dashboardAlerts"
+            );
+
+
+        if (alertBox) {
+
+            alertBox.innerHTML =
+                "";
+
+
+            if (!alerts.length) {
+
+                alertBox.innerHTML = `
+
+                    <div class="alert-row">
+
+                        🟢
+
+                        <div>
+
+                            <b>
+                                No active alerts
+                            </b>
+
+                            <small>
+                                You're currently clear
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+            else {
+
+                alerts
+                    .slice(0, 3)
+                    .forEach(
+                        alert => {
+
+                            const level =
+                                String(
+                                    alert.risk_level ||
+                                    "LOW"
+                                ).toLowerCase();
+
+
+                            let icon =
+                                "🟢";
+
+
+                            if (
+                                level ===
+                                "moderate"
+                            )
+                                icon = "🟠";
+
+
+                            if (
+                                level ===
+                                "high"
+                            )
+                                icon = "🔴";
+
+
+                            if (
+                                level ===
+                                "critical"
+                            )
+                                icon = "🟣";
+
+
+                            alertBox.innerHTML += `
+
+                                <div class="alert-row">
+
+                                    ${icon}
+
+                                    <div>
+
+                                        <b>
+                                            ${dashboardEscapeHTML(
+                                                alert.title ||
+                                                alert.hazard_type ||
+                                                "Risk alert"
+                                            )}
+                                        </b>
+
+                                        <small>
+                                            ${dashboardEscapeHTML(
+                                                formatTime(
+                                                    alert.created_at
+                                                )
+                                            )}
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            `;
+
+                        }
+                    );
+
+            }
+
+        }
+
+
+        /* =============================================
+           SAFETY STATUS
+        ============================================= */
+
+        const notificationStatus =
+            document.getElementById(
+                "notificationStatus"
+            );
+
+
+        if (notificationStatus) {
+
+            notificationStatus.textContent =
+                user.notifications_enabled
+                    ? "✓ Alert notifications enabled"
+                    : "⚠ Notifications disabled";
+
+        }
+
+
+        const locationStatus =
+            document.getElementById(
+                "locationStatus"
+            );
+
+
+        if (locationStatus) {
+
+            locationStatus.textContent =
+                user.location_enabled
+                    ? "✓ Location permission enabled"
+                    : "⚠ Location permission disabled";
+
+        }
+
+
+        const safetyStatus =
+            document.getElementById(
+                "safetyStatus"
+            );
+
+
+        if (safetyStatus) {
+
+            safetyStatus.textContent =
+                user.notifications_enabled &&
+                user.location_enabled
+                    ? "● Protected"
+                    : "● Setup required";
+
+        }
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Dashboard error:",
+            error
+        );
+
+
+        toast(
+            error.message ||
+            "Unable to load dashboard"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   LIVE WEATHER + OFFICIAL ALERT DATA
+===================================================== */
+
+async function loadLiveData(
+    lat,
+    lon
+) {
+
+    const status =
+        document.getElementById(
+            "liveDataStatus"
+        );
+
+
+    const source =
+        document.getElementById(
+            "liveDataSource"
+        );
+
+
+    const official =
+        document.getElementById(
+            "officialAlertMini"
+        );
+
+
+    try {
+
+        const data =
+            await api(
+                `/live-data/?lat=${encodeURIComponent(
+                    lat
+                )}&lon=${encodeURIComponent(
+                    lon
+                )}`
+            );
+
+
+        const weather =
+            data.weather || {};
+
+
+        const available =
+            weather.available !== false;
+
+
+        if (status) {
+
+            status.textContent =
+                available
+                    ? "LIVE"
+                    : "DEGRADED";
+
+
+            status.className =
+                "live-data-badge " +
+                (
+                    available
+                        ? "live"
+                        : "degraded"
+                );
+
+        }
+
+
+        const set =
+            (
+                id,
+                value
+            ) => {
+
+                const el =
+                    document.getElementById(
+                        id
+                    );
+
+
+                if (el)
+                    el.textContent =
+                        value;
+
+            };
+
+
+        set(
+            "liveTemp",
+            weather.temperature_c != null
+                ? `${weather.temperature_c}°C`
+                : "—"
+        );
+
+
+        set(
+            "liveHumidity",
+            weather.humidity_percent != null
+                ? `${weather.humidity_percent}%`
+                : "—"
+        );
+
+
+        set(
+            "liveRain",
+            weather.rainfall_mm != null
+                ? `${weather.rainfall_mm} mm`
+                : "—"
+        );
+
+
+        set(
+            "liveWind",
+            weather.wind_kmh != null
+                ? `${weather.wind_kmh} km/h`
+                : "—"
+        );
+
+
+        if (source) {
+
+            source.textContent =
+                weather.official
+                    ? `Official source: ${weather.provider}`
+                    : `Live weather: ${weather.provider} · fallback/demo source, not an official government warning feed`;
+
+        }
+
+
+        const feed =
+            data.official_alerts || {};
+
+
+        const count =
+            (
+                feed.alerts || []
+            ).length;
+
+
+        if (official) {
+
+            official.textContent =
+                feed.configured
+                    ? `${feed.provider}: ${count} live alert${count === 1 ? "" : "s"} available`
+                    : `${feed.provider}: feed not configured yet`;
+
+        }
+
+    }
+    catch (error) {
+
+        console.warn(
+            "Live data error:",
+            error
+        );
+
+
+        if (status) {
+
+            status.textContent =
+                "OFFLINE";
+
+
+            status.className =
+                "live-data-badge degraded";
+
+        }
+
+
+        if (source) {
+
+            source.textContent =
+                "Live data temporarily unavailable. Existing risk-zone demo remains active.";
+
+        }
+
+
+        if (official) {
+
+            official.textContent =
+                "SACHET / NDMA: unavailable";
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   PAGE LOAD
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        loadLiveDashboard();
+
+    }
+);
+
+</script>
+
+</body>
+</html>

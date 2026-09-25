@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Admin Risk Map | SURAKSHA NER</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Leaflet -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <style>
+
+        #riskMap {
+            width: 100%;
+            height: 620px;
+            border-radius: 18px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .map-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+        }
+
+        .zone-list {
+            max-height: 620px;
+            overflow-y: auto;
+        }
+
+        .zone-item {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+            cursor: pointer;
+        }
+
+        .zone-item:hover {
+            background: rgba(255,255,255,.04);
+        }
+
+        .zone-item b {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .zone-item small {
+            display: block;
+            margin-top: 5px;
+            opacity: .7;
+        }
+
+        .zone-score {
+            font-weight: 700;
+        }
+
+        .zone-status {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .zone-status.critical {
+            background: rgba(220,38,38,.18);
+            color: #ff6b6b;
+        }
+
+        .zone-status.high {
+            background: rgba(249,115,22,.18);
+            color: #ff9f43;
+        }
+
+        .zone-status.moderate {
+            background: rgba(234,179,8,.18);
+            color: #facc15;
+        }
+
+        .zone-status.low {
+            background: rgba(34,197,94,.18);
+            color: #4ade80;
+        }
+
+        .map-info {
+            padding: 18px;
+        }
+
+        @media(max-width:900px) {
+
+            .map-layout {
+                grid-template-columns: 1fr;
+            }
+
+            #riskMap {
+                height: 500px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header class="topbar appbar admin">
+
+    <a class="brand" href="admin-dashboard.html">
+
+        <span class="brand-mark">N</span>
+
+        NER<span class="accent">-SAFE</span>
+
+        <em>ADMIN</em>
+
+    </a>
+
+
+    <nav>
+
+        <a href="admin-dashboard.html">
+            Overview
+        </a>
+
+        <a class="active" href="admin-map.html">
+            Risk Map
+        </a>
+
+        <a href="admin-alerts.html">
+            Alerts
+        </a>
+
+        <a href="admin-users.html">
+            Users
+        </a>
+
+    </nav>
+
+
+    <a class="btn btn-light" href="dashboard.html">
+        User view
+    </a>
+
+</header>
+
+
+
+<main class="main">
+
+
+    <div class="page-head">
+
+        <div>
+
+            <span class="eyebrow">
+                RISK INTELLIGENCE
+            </span>
+
+            <h1>
+                Northeast Risk Map
+            </h1>
+
+            <p>
+                Live risk zones currently stored in the SURAKSHA NER system.
+            </p>
+
+        </div>
+
+
+        <button
+            class="btn btn-primary"
+            onclick="loadAdminRiskMap()">
+
+            ↻ Refresh
+
+        </button>
+
+    </div>
+
+
+
+    <div class="map-layout">
+
+
+        <!-- MAP -->
+
+        <section class="card">
+
+            <div
+                id="riskMap">
+            </div>
+
+        </section>
+
+
+
+        <!-- ZONE LIST -->
+
+        <section class="card">
+
+            <div class="map-info">
+
+                <span class="eyebrow">
+                    ACTIVE ZONES
+                </span>
+
+                <h2>
+                    Risk zones
+                </h2>
+
+                <p>
+                    Click a zone to locate it on the map.
+                </p>
+
+            </div>
+
+
+            <div
+                id="zoneList"
+                class="zone-list">
+
+                <div
+                    style="padding:25px;text-align:center;">
+
+                    Loading zones...
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </div>
+
+
+</main>
+
+
+
+<!-- Leaflet JS -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+<script src="js/script.js"></script>
+
+
+
+<script>
+
+
+let adminRiskMap = null;
+
+let zoneMarkers = [];
+
+
+
+function getRiskColor(level) {
+
+    level = String(level || "").toUpperCase();
+
+
+    if (level === "CRITICAL") {
+        return "#dc2626";
+    }
+
+    if (level === "HIGH") {
+        return "#f97316";
+    }
+
+    if (level === "MODERATE") {
+        return "#eab308";
+    }
+
+    return "#22c55e";
+
+}
+
+
+
+function riskClass(level) {
+
+    level = String(level || "").toLowerCase();
+
+    if (level === "critical") return "critical";
+    if (level === "high") return "high";
+    if (level === "moderate") return "moderate";
+
+    return "low";
+
+}
+
+
+
+function createRiskCircle(zone) {
+
+    const lat = Number(zone.latitude);
+
+    const lon = Number(zone.longitude);
+
+    const radiusKm = Number(zone.radius_km || 10);
+
+    const color = getRiskColor(zone.risk_level);
+
+
+    const circle = L.circle(
+
+        [lat, lon],
+
+        {
+
+            radius: radiusKm * 1000,
+
+            color: color,
+
+            fillColor: color,
+
+            fillOpacity: 0.18,
+
+            weight: 2
+
+        }
+
+    );
+
+
+    circle.bindPopup(`
+
+        <div style="min-width:220px">
+
+            <h3 style="margin:0 0 8px">
+                ${escapeHTML(zone.name)}
+            </h3>
+
+            <b>
+                ${escapeHTML(zone.hazard_type)}
+            </b>
+
+            <br>
+
+            Risk:
+            <strong style="color:${color}">
+                ${escapeHTML(zone.risk_level)}
+            </strong>
+
+            <br>
+
+            Score:
+            <strong>
+                ${escapeHTML(zone.risk_score)}
+            </strong>
+
+            <br>
+
+            Radius:
+            ${escapeHTML(zone.radius_km)} km
+
+            <hr>
+
+            <small>
+                ${escapeHTML(zone.reason || "No reason provided")}
+            </small>
+
+        </div>
+
+    `);
+
+
+    circle.addTo(adminRiskMap);
+
+
+    zoneMarkers.push(circle);
+
+
+    return circle;
+
+}
+
+
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
+}
+
+
+
+function focusZone(index) {
+
+    const circle = zoneMarkers[index];
+
+    if (!circle) return;
+
+
+    adminRiskMap.fitBounds(
+        circle.getBounds(),
+        {
+            padding: [40, 40]
+        }
+    );
+
+
+    circle.openPopup();
+
+}
+
+
+
+async function loadAdminRiskMap() {
+
+
+    if (!getToken()) {
+
+        window.location.href = "login.html";
+
+        return;
+
+    }
+
+
+    try {
+
+
+        const me = await loadMe();
+
+
+        if (!me || !me.is_staff) {
+
+            toast("Admin access required");
+
+            setTimeout(() => {
+
+                window.location.href =
+                    "dashboard.html";
+
+            }, 700);
+
+            return;
+
+        }
+
+
+
+        const data =
+            await api("/risk-zones/");
+
+
+        const zones =
+            data.results || [];
+
+
+
+        // --------------------------------
+        // CREATE MAP
+        // --------------------------------
+
+        if (!adminRiskMap) {
+
+            adminRiskMap = L.map(
+                "riskMap"
+            ).setView(
+                [26.5, 92.0],
+                7
+            );
+
+
+            L.tileLayer(
+
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+                {
+
+                    maxZoom: 18,
+
+                    attribution:
+                        '&copy; OpenStreetMap contributors'
+
+                }
+
+            ).addTo(adminRiskMap);
+
+        }
+
+
+
+        // --------------------------------
+        // REMOVE OLD MARKERS
+        // --------------------------------
+
+        zoneMarkers.forEach(
+            marker => adminRiskMap.removeLayer(marker)
+        );
+
+        zoneMarkers = [];
+
+
+
+        // --------------------------------
+        // ZONE LIST
+        // --------------------------------
+
+        const list =
+            document.getElementById("zoneList");
+
+
+        list.innerHTML = "";
+
+
+
+        if (!zones.length) {
+
+            list.innerHTML = `
+
+                <div
+                    style="padding:25px;text-align:center">
+
+                    No active risk zones found.
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+
+        // --------------------------------
+        // ADD ZONES
+        // --------------------------------
+
+        zones.forEach((zone, index) => {
+
+
+            if (
+                zone.latitude == null ||
+                zone.longitude == null
+            ) {
+
+                return;
+
+            }
+
+
+            createRiskCircle(zone);
+
+
+
+            const item =
+                document.createElement("div");
+
+
+            item.className =
+                "zone-item";
+
+
+            item.onclick =
+                () => focusZone(index);
+
+
+            item.innerHTML = `
+
+                <b>
+                    ${escapeHTML(zone.name)}
+                </b>
+
+                <span>
+                    ${escapeHTML(zone.hazard_type)}
+                </span>
+
+                <small>
+
+                    Risk score:
+                    <span class="zone-score">
+                        ${escapeHTML(zone.risk_score)}
+                    </span>
+
+                </small>
+
+                <small>
+
+                    Radius:
+                    ${escapeHTML(zone.radius_km)} km
+
+                </small>
+
+                <span
+                    class="zone-status ${riskClass(zone.risk_level)}">
+
+                    ${escapeHTML(
+                        String(zone.risk_level || "")
+                            .toUpperCase()
+                    )}
+
+                </span>
+
+            `;
+
+
+            list.appendChild(item);
+
+        });
+
+
+
+        // --------------------------------
+        // FIT MAP TO ALL ZONES
+        // --------------------------------
+
+        if (zoneMarkers.length) {
+
+            const group =
+                L.featureGroup(zoneMarkers);
+
+            adminRiskMap.fitBounds(
+                group.getBounds(),
+                {
+                    padding: [30, 30]
+                }
+            );
+
+        }
+
+
+        toast(
+            `${zones.length} risk zones loaded`
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        toast(
+            error.message ||
+            "Unable to load risk zones"
+        );
+
+    }
+
+}
+
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        loadAdminRiskMap();
+
+    }
+);
+
+
+</script>
+
+
+</body>
+</html>

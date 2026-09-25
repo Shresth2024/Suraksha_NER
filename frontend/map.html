@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width,initial-scale=1">
+
+    <title>Risk Map | SURAKSHA NER</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css">
+
+    <!-- Leaflet -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <style>
+
+        #userRiskMap {
+
+            width: 100%;
+
+            height: 650px;
+
+            border-radius: 18px;
+
+            overflow: hidden;
+
+        }
+
+
+        .map-layout {
+
+            display: grid;
+
+            grid-template-columns:
+                300px 1fr;
+
+            gap: 20px;
+
+        }
+
+
+        .sidebar {
+
+            padding: 20px;
+
+        }
+
+
+        .legend-list p {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            margin: 12px 0;
+
+        }
+
+
+        .zone {
+
+            margin-top: 15px;
+
+            padding: 15px;
+
+            border-radius: 14px;
+
+            background:
+                rgba(255,255,255,.04);
+
+        }
+
+
+        .zone h2 {
+
+            margin:
+                12px 0 5px;
+
+        }
+
+
+        .zone p {
+
+            margin:
+                6px 0;
+
+        }
+
+
+        .map-controls {
+
+            display: flex;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        .filter {
+
+            cursor: pointer;
+
+        }
+
+
+        @media(max-width:900px) {
+
+            .map-layout {
+
+                grid-template-columns: 1fr;
+
+            }
+
+            #userRiskMap {
+
+                height: 500px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header class="topbar appbar">
+
+    <a
+        class="brand"
+        href="dashboard.html">
+
+        <span class="brand-mark">
+            N
+        </span>
+
+        NER<span class="accent">
+            -SAFE
+        </span>
+
+    </a>
+
+
+    <nav>
+
+        <a href="dashboard.html">
+            Dashboard
+        </a>
+
+        <a
+            class="active"
+            href="map.html">
+
+            Risk Map
+
+        </a>
+
+        <a href="alerts.html">
+            Alerts
+        </a>
+
+        <a href="safety.html">
+            Safety
+        </a>
+
+    </nav>
+
+
+    <div class="nav-actions">
+
+        <a
+            class="round"
+            href="settings.html">
+
+            ⚙
+
+        </a>
+
+        <a
+            class="avatar"
+            href="profile.html">
+
+            JK
+
+        </a>
+
+    </div>
+
+</header>
+
+
+
+<main class="map-page">
+
+
+    <div class="page-head">
+
+        <div>
+
+            <span class="eyebrow">
+                GIS RISK INTELLIGENCE
+            </span>
+
+            <h1>
+                NER Risk Map
+            </h1>
+
+            <p>
+                Live risk zones from the SURAKSHA NER system.
+            </p>
+
+        </div>
+
+
+        <div class="map-controls">
+
+            <button
+                class="filter active"
+                onclick="filterZones('all', this)">
+
+                All
+
+            </button>
+
+            <button
+                class="filter"
+                onclick="filterZones('landslide', this)">
+
+                Landslide
+
+            </button>
+
+            <button
+                class="filter"
+                onclick="filterZones('flood', this)">
+
+                Flood
+
+            </button>
+
+            <button
+                class="filter"
+                onclick="filterZones('rainfall', this)">
+
+                Rainfall
+
+            </button>
+
+            <button
+                class="btn btn-primary"
+                onclick="locateUser()">
+
+                📍 My location
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="map-layout">
+
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar card">
+
+
+            <h3>
+                Risk legend
+            </h3>
+
+
+            <div class="legend-list">
+
+                <p>
+                    🟢 Low
+                    <b>0–25</b>
+                </p>
+
+                <p>
+                    🟠 Moderate
+                    <b>26–50</b>
+                </p>
+
+                <p>
+                    🔴 High
+                    <b>51–75</b>
+                </p>
+
+                <p>
+                    🟣 Critical
+                    <b>76–100</b>
+                </p>
+
+            </div>
+
+
+            <hr>
+
+
+            <h3>
+                Selected zone
+            </h3>
+
+
+            <div
+                id="selectedZone"
+                class="zone">
+
+                <span class="risk-pill low">
+                    SELECT A ZONE
+                </span>
+
+                <h2>
+                    —
+                </h2>
+
+                <p>
+                    Risk score
+                    <b>—</b>
+                </p>
+
+                <small>
+                    Click a risk zone on the map.
+                </small>
+
+            </div>
+
+
+            <hr>
+
+
+            <h3>
+                Your location
+            </h3>
+
+
+            <div
+                id="userLocationInfo">
+
+                <small>
+                    Loading...
+                </small>
+
+            </div>
+
+
+        </aside>
+
+
+
+        <!-- MAP -->
+
+        <div class="big-map">
+
+            <div id="userRiskMap"></div>
+
+        </div>
+
+
+    </div>
+
+
+</main>
+
+
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+<script src="js/script.js"></script>
+
+
+<script>
+
+
+let userRiskMap = null;
+
+let allZones = [];
+
+let zoneLayers = [];
+
+let userMarker = null;
+
+
+
+function getRiskColor(level) {
+
+    level =
+        String(level || "")
+        .toUpperCase();
+
+
+    if (level === "CRITICAL")
+        return "#dc2626";
+
+    if (level === "HIGH")
+        return "#f97316";
+
+    if (level === "MODERATE")
+        return "#eab308";
+
+    return "#22c55e";
+
+}
+
+
+
+function riskClass(level) {
+
+    level =
+        String(level || "")
+        .toLowerCase();
+
+
+    if (level === "critical")
+        return "critical";
+
+    if (level === "high")
+        return "high";
+
+    if (level === "moderate")
+        return "moderate";
+
+    return "low";
+
+}
+
+
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
+}
+
+
+
+function createMap() {
+
+    if (userRiskMap)
+        return;
+
+
+    userRiskMap =
+        L.map("userRiskMap")
+        .setView(
+            [26.5, 92.0],
+            7
+        );
+
+
+    L.tileLayer(
+
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+        {
+
+            maxZoom: 18,
+
+            attribution:
+                '&copy; OpenStreetMap contributors'
+
+        }
+
+    ).addTo(userRiskMap);
+
+}
+
+
+
+function renderZones(filter = "all") {
+
+    // Remove old layers
+    zoneLayers.forEach(layer => {
+        userRiskMap.removeLayer(layer);
+    });
+
+    zoneLayers = [];
+
+    const visibleZones = allZones.filter(zone => {
+
+        if (filter === "all")
+            return true;
+
+        return String(zone.hazard_type || "")
+            .toLowerCase()
+            .includes(filter);
+    });
+
+    visibleZones.forEach(zone => {
+
+        if (
+            zone.latitude == null ||
+            zone.longitude == null
+        ) {
+            return;
+        }
+
+        const lat = Number(zone.latitude);
+        const lon = Number(zone.longitude);
+
+        const radius = Number(zone.radius_km || 10);
+
+        const color = getRiskColor(zone.risk_level);
+
+        let layer = null;
+
+        // ==========================================
+        // REAL GIS POLYGON
+        // ==========================================
+
+        if (
+            Array.isArray(zone.boundary) &&
+            zone.boundary.length >= 3
+        ) {
+
+            const polygonPoints = zone.boundary
+                .map(point => {
+
+                    if (
+                        !Array.isArray(point) ||
+                        point.length < 2
+                    ) {
+                        return null;
+                    }
+
+                    // Backend format:
+                    // [longitude, latitude]
+                    //
+                    // Leaflet format:
+                    // [latitude, longitude]
+
+                    const polygonLon = Number(point[0]);
+                    const polygonLat = Number(point[1]);
+
+                    if (
+                        !Number.isFinite(polygonLat) ||
+                        !Number.isFinite(polygonLon)
+                    ) {
+                        return null;
+                    }
+
+                    return [
+                        polygonLat,
+                        polygonLon
+                    ];
+                })
+                .filter(Boolean);
+
+            if (polygonPoints.length >= 3) {
+
+                layer = L.polygon(
+                    polygonPoints,
+                    {
+                        color: color,
+                        fillColor: color,
+                        fillOpacity: 0.22,
+                        weight: 3
+                    }
+                );
+
+            }
+        }
+
+        // ==========================================
+        // FALLBACK: RADIUS CIRCLE
+        // ==========================================
+
+        if (!layer) {
+
+            layer = L.circle(
+                [lat, lon],
+                {
+                    radius: radius * 1000,
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.18,
+                    weight: 2
+                }
+            );
+
+        }
+
+        layer.addTo(userRiskMap);
+
+        // ==========================================
+        // POPUP
+        // ==========================================
+
+        const boundaryText =
+            Array.isArray(zone.boundary) &&
+            zone.boundary.length >= 3
+                ? "GIS Polygon"
+                : "Radius Zone";
+
+        layer.bindPopup(`
+
+            <div style="min-width:220px">
+
+                <h3 style="margin:0 0 8px">
+                    ${escapeHTML(zone.name)}
+                </h3>
+
+                <b>
+                    ${escapeHTML(zone.hazard_type)}
+                </b>
+
+                <br><br>
+
+                Risk:
+
+                <strong style="color:${color}">
+                    ${escapeHTML(zone.risk_level)}
+                </strong>
+
+                <br>
+
+                Score:
+
+                <strong>
+                    ${escapeHTML(zone.risk_score)}
+                </strong>
+
+                <br>
+
+                Zone type:
+                <strong>
+                    ${boundaryText}
+                </strong>
+
+                ${
+                    boundaryText === "Radius Zone"
+                        ? `
+                            <br>
+                            Radius:
+                            ${escapeHTML(zone.radius_km)} km
+                          `
+                        : ""
+                }
+
+                <hr>
+
+                <small>
+                    ${escapeHTML(
+                        zone.reason ||
+                        "No additional information"
+                    )}
+                </small>
+
+            </div>
+
+        `);
+
+        // ==========================================
+        // CLICK → SIDEBAR
+        // ==========================================
+
+        layer.on(
+            "click",
+            function () {
+                showSelectedZone(zone);
+            }
+        );
+
+        zoneLayers.push(layer);
+
+    });
+
+    // ==========================================
+    // FIT MAP TO ALL ZONES
+    // ==========================================
+
+    if (zoneLayers.length) {
+
+        const group =
+            L.featureGroup(zoneLayers);
+
+        userRiskMap.fitBounds(
+            group.getBounds(),
+            {
+                padding: [30, 30]
+            }
+        );
+    }
+}
+
+function showSelectedZone(zone) {
+
+    const box =
+        document.getElementById(
+            "selectedZone"
+        );
+
+
+    box.innerHTML = `
+
+        <span class="risk-pill ${riskClass(
+            zone.risk_level
+        )}">
+
+            ${escapeHTML(
+                String(
+                    zone.risk_level
+                ).toUpperCase()
+            )}
+
+        </span>
+
+
+        <h2>
+            ${escapeHTML(
+                zone.name
+            )}
+        </h2>
+
+
+        <p>
+
+            Risk score
+
+            <b>
+                ${escapeHTML(
+                    zone.risk_score
+                )}/100
+            </b>
+
+        </p>
+
+
+        <small>
+
+            ${escapeHTML(
+                zone.reason ||
+                "Risk zone currently monitored."
+            )}
+
+        </small>
+
+    `;
+
+}
+
+
+
+async function loadUserRiskMap() {
+
+
+    if (!getToken()) {
+
+        window.location.href =
+            "login.html";
+
+        return;
+
+    }
+
+
+    try {
+
+
+        const me =
+            await loadMe();
+
+
+        if (!me)
+            return;
+
+
+        createMap();
+
+
+        const data =
+            await api(
+                "/risk-zones/"
+            );
+
+
+        allZones =
+            data.results || [];
+
+
+        renderZones();
+
+
+        // -------------------------
+        // USER LOCATION
+        // -------------------------
+
+        if (
+            me.latitude != null &&
+            me.longitude != null
+        ) {
+
+            addUserMarker(
+                me.latitude,
+                me.longitude
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        toast(
+            error.message ||
+            "Unable to load risk map"
+        );
+
+    }
+
+}
+
+
+
+function addUserMarker(
+    latitude,
+    longitude
+) {
+
+
+    if (userMarker) {
+
+        userRiskMap.removeLayer(
+            userMarker
+        );
+
+    }
+
+
+    userMarker =
+        L.marker(
+            [
+                Number(latitude),
+                Number(longitude)
+            ]
+        )
+        .addTo(userRiskMap);
+
+
+    userMarker.bindPopup(
+        "<b>📍 You are here</b>"
+    );
+
+
+    document.getElementById(
+        "userLocationInfo"
+    ).innerHTML = `
+
+        <b>
+            ${Number(latitude).toFixed(4)},
+            ${Number(longitude).toFixed(4)}
+        </b>
+
+        <br>
+
+        <small>
+            Current registered location
+        </small>
+
+    `;
+
+}
+
+
+
+function locateUser() {
+
+    if (!navigator.geolocation) {
+
+        toast(
+            "Geolocation is not supported by this browser."
+        );
+
+        return;
+
+    }
+
+
+    toast(
+        "Getting your current location..."
+    );
+
+
+    navigator.geolocation.getCurrentPosition(
+
+        async position => {
+
+            const lat =
+                position.coords.latitude;
+
+            const lon =
+                position.coords.longitude;
+
+
+            addUserMarker(
+                lat,
+                lon
+            );
+
+
+            userRiskMap.setView(
+                [lat, lon],
+                11
+            );
+
+
+            try {
+
+                const data =
+                    await api(
+                        "/location/",
+                        {
+
+                            method: "POST",
+
+                            body:
+                                JSON.stringify({
+
+                                    latitude: lat,
+
+                                    longitude: lon
+
+                                })
+
+                        }
+                    );
+
+
+                if (
+                    data.new_alerts &&
+                    data.new_alerts.length
+                ) {
+
+                    toast(
+                        "⚠ New risk alert generated!"
+                    );
+
+                } else {
+
+                    toast(
+                        "Location updated successfully."
+                    );
+
+                }
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                toast(
+                    error.message ||
+                    "Location update failed"
+                );
+
+            }
+
+        },
+
+
+        error => {
+
+            toast(
+                "Location permission was not granted."
+            );
+
+        },
+
+        {
+
+            enableHighAccuracy: true,
+
+            timeout: 10000,
+
+            maximumAge: 0
+
+        }
+
+    );
+
+}
+
+
+
+function filterZones(
+    filter,
+    button
+) {
+
+
+    document
+        .querySelectorAll(".filter")
+        .forEach(
+            b => b.classList.remove(
+                "active"
+            )
+        );
+
+
+    button.classList.add(
+        "active"
+    );
+
+
+    renderZones(
+        filter
+    );
+
+}
+
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        loadUserRiskMap();
+
+    }
+);
+
+
+</script>
+
+
+</body>
+</html>
