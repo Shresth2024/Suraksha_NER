@@ -2,525 +2,353 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Alert Testing | SURAKSHA NER</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Alert Testing Dashboard | SURAKSHA NER</title>
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background: #0b1220;
-            color: white;
-            padding: 30px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: auto;
-        }
-
-        h1 {
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            color: #9ca3af;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: #151f32;
-            border: 1px solid #26344d;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        .card h2 {
-            margin-bottom: 20px;
-        }
-
-        .inputs {
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
         }
 
-        label {
+        .field label {
             display: block;
-            margin-bottom: 7px;
-            color: #cbd5e1;
+            font-size: 0.78rem;
+            color: var(--muted, #94a3b8);
+            margin-bottom: 6px;
         }
 
-        input,
-        select {
+        .field select,
+        .field textarea {
             width: 100%;
-            padding: 12px;
-            border-radius: 7px;
-            border: 1px solid #374151;
-            background: #0f172a;
-            color: white;
-        }
-
-        button {
-            margin-top: 20px;
-            padding: 12px 22px;
-            border: none;
-            border-radius: 7px;
-            background: #16a34a;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        button:hover {
-            opacity: 0.85;
-        }
-
-        .result {
-            margin-top: 25px;
-            padding: 20px;
+            padding: 11px 12px;
             border-radius: 10px;
-            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.25);
+            color: inherit;
         }
 
-        .severity {
-            font-size: 28px;
-            font-weight: bold;
-            margin: 10px 0;
+        .field textarea {
+            min-height: 100px;
+            resize: vertical;
         }
 
-        .message {
-            color: #cbd5e1;
+        .form-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .preview-card {
+            padding: 20px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .preview-card.critical {
+            border-color: rgba(239, 68, 68, 0.45);
+        }
+
+        .preview-top,
+        .official-alert-top {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .type-pill {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+        }
+
+        .risk-pill.medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+        }
+
+        .emergency-tag {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #fecaca;
+            background: rgba(220, 38, 38, 0.35);
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .preview-meta {
+            margin-top: 12px;
+            font-size: 0.88rem;
             line-height: 1.6;
+            opacity: 0.9;
         }
 
-        .tests {
-            display: grid;
-            gap: 12px;
-        }
-
-        .test {
+        .test-row {
             display: flex;
             justify-content: space-between;
-            padding: 15px;
-            background: #0f172a;
-            border-radius: 8px;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
         }
 
-        .pass {
+        .test-row .pass,
+        .overall.pass {
             color: #22c55e;
-            font-weight: bold;
+            font-weight: 800;
         }
 
-        .fail {
+        .test-row .fail,
+        .overall.fail {
             color: #ef4444;
-            font-weight: bold;
+            font-weight: 800;
         }
 
-        .history {
-            margin-top: 15px;
+        .overall-row {
+            margin-bottom: 12px;
+            font-size: 1rem;
         }
 
-        .history-item {
-            padding: 12px;
+        .table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-wrap th,
+        .table-wrap td {
+            text-align: left;
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.88rem;
+        }
+
+        .empty-cell,
+        .empty-note {
+            text-align: center;
+            padding: 20px;
+            opacity: 0.75;
+        }
+
+        .mock-note {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin-bottom: 12px;
+        }
+
+        .mock-official {
+            margin-top: 12px;
+            padding: 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .sachet-check.ok {
+            color: #86efac;
+        }
+
+        .sachet-check.warn {
+            color: #fcd34d;
+        }
+
+        .json-details {
+            margin-top: 16px;
+        }
+
+        .json-details pre {
             margin-top: 8px;
-            background: #0f172a;
-            border-left: 4px solid #22c55e;
+            padding: 14px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.35);
+            overflow: auto;
+            font-size: 0.75rem;
+            max-height: 280px;
         }
 
-        @media(max-width: 700px) {
-            .inputs {
+        @media (max-width: 900px) {
+            .dashboard-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
-
 <body>
 
-<div class="container">
+<header class="topbar appbar">
+    <a class="brand" href="dashboard.html">
+        <span class="brand-mark">N</span>
+        NER<span class="accent">-SAFE</span>
+    </a>
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="map.html">Risk Map</a>
+        <a href="alerts.html">Alerts <b class="badge">LIVE</b></a>
+        <a href="safety.html">Safety</a>
+        <a class="active" href="alerts-testing.html">Testing</a>
+    </nav>
+    <div class="nav-actions">
+        <a class="round" href="settings.html">⚙</a>
+        <a class="avatar" href="profile.html">JK</a>
+    </div>
+</header>
 
-    <h1>🚨 SURAKSHA NER — Alert Testing</h1>
+<main class="main">
 
-    <p class="subtitle">
-        Alert simulation and testing module for disaster risk monitoring.
-    </p>
-
-
-    <!-- ALERT SIMULATOR -->
-
-    <div class="card">
-
-        <h2>Alert Simulator</h2>
-
-        <div class="inputs">
-
-            <div>
-                <label>Location</label>
-                <input
-                    type="text"
-                    id="location"
-                    placeholder="Example: Guwahati"
-                >
-            </div>
-
-            <div>
-                <label>Rainfall (mm)</label>
-                <input
-                    type="number"
-                    id="rainfall"
-                    value="50"
-                >
-            </div>
-
-            <div>
-                <label>Flood Level (m)</label>
-                <input
-                    type="number"
-                    id="flood"
-                    value="1"
-                    step="0.1"
-                >
-            </div>
-
-            <div>
-                <label>Landslide Risk (%)</label>
-                <input
-                    type="number"
-                    id="landslide"
-                    value="20"
-                    min="0"
-                    max="100"
-                >
-            </div>
-
-        </div>
-
-        <button onclick="generateAlert()">
-            🚨 Generate Alert
-        </button>
-
-
-        <div id="result" class="result">
-
-            <h3>Alert Result</h3>
-
-            <div id="severity" class="severity">
-                No alert generated
-            </div>
-
-            <p id="message" class="message">
-                Enter the environmental data and generate an alert.
+    <div class="page-head">
+        <div>
+            <span class="eyebrow">ALERTS · SACHET / NDMA · QA</span>
+            <h1>Alert Testing Dashboard</h1>
+            <p>
+                Simulate alerts, validate inputs, and review a mock official
+                feed response — no API credentials required.
             </p>
-
         </div>
-
     </div>
 
+    <div class="dashboard-grid">
 
-    <!-- AUTOMATED TESTS -->
+        <!-- INPUT PANEL -->
+        <section class="card">
+            <div class="card-head">
+                <h3>Configure test alert</h3>
+            </div>
 
-    <div class="card">
+            <div class="form-stack">
+                <div class="field">
+                    <label for="inputLocation">Location</label>
+                    <select id="inputLocation"></select>
+                </div>
 
-        <h2>🧪 Alert Rule Tests</h2>
+                <div class="field">
+                    <label for="inputRisk">Risk level</label>
+                    <select id="inputRisk">
+                        <option value="LOW">Low</option>
+                        <option value="MEDIUM" selected>Medium</option>
+                        <option value="HIGH">High</option>
+                        <option value="CRITICAL">Critical</option>
+                    </select>
+                </div>
 
-        <p class="subtitle">
-            Test different disaster scenarios automatically.
+                <div class="field">
+                    <label for="inputType">Alert type</label>
+                    <select id="inputType">
+                        <option value="Landslide">Landslide</option>
+                        <option value="Flood">Flood</option>
+                        <option value="Heavy Rainfall" selected>Heavy Rainfall</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="inputMessage">Alert message</label>
+                    <textarea
+                        id="inputMessage"
+                        placeholder="Example: Heavy rainfall may cause flash floods and slope instability in the selected area."
+                    ></textarea>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button type="button" class="btn btn-primary" id="testAlertBtn">
+                    TEST ALERT
+                </button>
+                <button type="button" class="btn btn-light" id="resetBtn">
+                    Clear / Reset
+                </button>
+            </div>
+        </section>
+
+        <!-- PREVIEW + STATUS -->
+        <div>
+            <section class="card" style="margin-bottom: 24px;">
+                <div class="card-head">
+                    <h3>Generated alert preview</h3>
+                </div>
+                <div id="alertPreview">
+                    <p class="empty-note">Generated alert preview will appear here.</p>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-head">
+                    <h3>Test result / status</h3>
+                </div>
+                <div id="testStatus">
+                    <p class="empty-note">Run TEST ALERT to see validation results.</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- MOCK SACHET -->
+    <section class="card" style="margin-bottom: 24px;">
+        <div class="card-head">
+            <h3>Mock SACHET / NDMA API response</h3>
+        </div>
+        <p class="mock-note">
+            Demonstration payload shaped like <code>official_alerts</code> from the
+            Django backend. No network request is made.
         </p>
-
-        <div class="tests" id="tests"></div>
-
-        <button onclick="runTests()">
-            ▶ Run All Tests
-        </button>
-
-    </div>
-
-
-    <!-- ALERT HISTORY -->
-
-    <div class="card">
-
-        <h2>📋 Alert Test History</h2>
-
-        <div id="history" class="history">
-            No alerts tested yet.
+        <div id="sachetMockPanel">
+            <p class="empty-note">Mock SACHET/NDMA response loads when you run TEST ALERT.</p>
         </div>
-
-    </div>
-
-</div>
-
-
-<script>
-
-    /*
-        SURAKSHA NER
-        Alert Testing Engine
-
-        This is a frontend testing module.
-        It does not modify the existing backend.
-    */
-
-
-    function calculateRisk(rainfall, flood, landslide) {
-
-        let score = 0;
-
-
-        // Rainfall contribution
-
-        if (rainfall >= 200) {
-            score += 40;
-        }
-        else if (rainfall >= 100) {
-            score += 30;
-        }
-        else if (rainfall >= 50) {
-            score += 15;
-        }
-
-
-        // Flood contribution
-
-        if (flood >= 3) {
-            score += 35;
-        }
-        else if (flood >= 2) {
-            score += 25;
-        }
-        else if (flood >= 1) {
-            score += 10;
-        }
-
-
-        // Landslide contribution
-
-        if (landslide >= 80) {
-            score += 30;
-        }
-        else if (landslide >= 60) {
-            score += 25;
-        }
-        else if (landslide >= 30) {
-            score += 15;
-        }
-
-
-        return score;
-    }
-
-
-    function getSeverity(score) {
-
-        if (score >= 80) {
-            return "CRITICAL";
-        }
-
-        if (score >= 60) {
-            return "HIGH";
-        }
-
-        if (score >= 30) {
-            return "MODERATE";
-        }
-
-        return "LOW";
-    }
-
-
-    function generateAlert() {
-
-        const location =
-            document.getElementById("location").value || "Unknown Location";
-
-        const rainfall =
-            Number(document.getElementById("rainfall").value);
-
-        const flood =
-            Number(document.getElementById("flood").value);
-
-        const landslide =
-            Number(document.getElementById("landslide").value);
-
-
-        const score =
-            calculateRisk(
-                rainfall,
-                flood,
-                landslide
-            );
-
-
-        const severity =
-            getSeverity(score);
-
-
-        document.getElementById("severity").innerText =
-            severity + " ALERT";
-
-
-        document.getElementById("message").innerText =
-            `Location: ${location}
-             | Risk Score: ${score}
-             | Rainfall: ${rainfall} mm
-             | Flood Level: ${flood} m
-             | Landslide Risk: ${landslide}%`;
-
-
-        addHistory(
-            location,
-            severity,
-            score
-        );
-    }
-
-
-    function addHistory(
-        location,
-        severity,
-        score
-    ) {
-
-        const history =
-            document.getElementById("history");
-
-
-        if (
-            history.innerText ===
-            "No alerts tested yet."
-        ) {
-
-            history.innerHTML = "";
-
-        }
-
-
-        const item =
-            document.createElement("div");
-
-
-        item.className =
-            "history-item";
-
-
-        item.innerHTML =
-            `<strong>${severity} ALERT</strong>
-             — ${location}
-             — Risk Score: ${score}`;
-
-
-        history.prepend(item);
-    }
-
-
-    /*
-        AUTOMATED TEST CASES
-    */
-
-    const testCases = [
-
-        {
-            name: "Normal Weather",
-            rainfall: 20,
-            flood: 0.5,
-            landslide: 5,
-            expected: "LOW"
-        },
-
-        {
-            name: "Heavy Rain",
-            rainfall: 120,
-            flood: 1,
-            landslide: 20,
-            expected: "MODERATE"
-        },
-
-        {
-            name: "Flood Risk",
-            rainfall: 150,
-            flood: 2,
-            landslide: 40,
-            expected: "HIGH"
-        },
-
-        {
-            name: "Extreme Disaster",
-            rainfall: 250,
-            flood: 4,
-            landslide: 90,
-            expected: "CRITICAL"
-        }
-
-    ];
-
-
-    function runTests() {
-
-        const container =
-            document.getElementById("tests");
-
-
-        container.innerHTML = "";
-
-
-        testCases.forEach(test => {
-
-            const score =
-                calculateRisk(
-                    test.rainfall,
-                    test.flood,
-                    test.landslide
-                );
-
-
-            const actual =
-                getSeverity(score);
-
-
-            const passed =
-                actual === test.expected;
-
-
-            const div =
-                document.createElement("div");
-
-
-            div.className =
-                "test";
-
-
-            div.innerHTML = `
-
-                <span>
-                    ${test.name}
-                </span>
-
-                <span class="${passed ? "pass" : "fail"}">
-
-                    ${passed ? "✓ PASS" : "✗ FAIL"}
-
-                    (${actual})
-
-                </span>
-
-            `;
-
-
-            container.appendChild(div);
-
-        });
-
-    }
-
-</script>
-
+    </section>
+
+    <!-- HISTORY -->
+    <section class="card table-wrap">
+        <div class="card-head">
+            <h3>Alert test history</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>Risk</th>
+                    <th>Status</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody id="historyBody">
+                <tr>
+                    <td colspan="6" class="empty-cell">No test alerts yet.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- OPTIONAL AUTOMATED SUITE -->
+    <section class="card" style="margin-top: 24px;">
+        <div class="card-head">
+            <h3>Automated checks</h3>
+            <button type="button" class="btn btn-light" id="runAllTestsBtn">
+                Run All Tests
+            </button>
+        </div>
+        <p class="mock-note">Quick regression suite for validation and emergency rules.</p>
+        <div id="autoTestResults"></div>
+        <p id="autoTestSummary" class="mock-note"></p>
+    </section>
+
+</main>
+
+<script src="js/alerts-testing.js"></script>
 </body>
 </html>
